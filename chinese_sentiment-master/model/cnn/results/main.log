@@ -1,0 +1,61 @@
+Using config: {'_model_dir': 'results/model', '_tf_random_seed': None, '_save_summary_steps': 100, '_save_checkpoints_steps': None, '_save_checkpoints_secs': 10, '_session_config': allow_soft_placement: true
+graph_options {
+  rewrite_options {
+    meta_optimizer_iterations: ONE
+  }
+}
+, '_keep_checkpoint_max': 5, '_keep_checkpoint_every_n_hours': 10000, '_log_step_count_steps': 100, '_train_distribute': None, '_device_fn': None, '_protocol': None, '_eval_distribute': None, '_experimental_distribute': None, '_service': None, '_cluster_spec': <tensorflow.python.training.server_lib.ClusterSpec object at 0x00000169BD1B3978>, '_task_type': 'worker', '_task_id': 0, '_global_id_in_cluster': 0, '_master': '', '_evaluation_master': '', '_is_chief': True, '_num_ps_replicas': 0, '_num_worker_replicas': 1}
+Not using Distribute Coordinator.
+Running training and evaluation locally (non-distributed).
+Start train and evaluate loop. The evaluate will happen after every checkpoint. Checkpoint frequency is determined based on RunConfig arguments: save_checkpoints_steps None or save_checkpoints_secs 10.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\framework\op_def_library.py:263: colocate_with (from tensorflow.python.framework.ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Colocations handled automatically by placer.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\data\ops\dataset_ops.py:429: py_func (from tensorflow.python.ops.script_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+tf.py_func is deprecated in TF V2. Instead, use
+    tf.py_function, which takes a python function which manipulates tf eager
+    tensors instead of numpy arrays. It's easy to convert a tf eager tensor to
+    an ndarray (just call tensor.numpy()) but having access to eager tensors
+    means `tf.py_function`s can use accelerators such as GPUs as well as
+    being differentiable using a gradient tape.
+    
+Calling model_fn.
+Using config: {'_model_dir': 'results/model', '_tf_random_seed': None, '_save_summary_steps': 100, '_save_checkpoints_steps': None, '_save_checkpoints_secs': 10, '_session_config': allow_soft_placement: true
+graph_options {
+  rewrite_options {
+    meta_optimizer_iterations: ONE
+  }
+}
+, '_keep_checkpoint_max': 5, '_keep_checkpoint_every_n_hours': 10000, '_log_step_count_steps': 100, '_train_distribute': None, '_device_fn': None, '_protocol': None, '_eval_distribute': None, '_experimental_distribute': None, '_service': None, '_cluster_spec': <tensorflow.python.training.server_lib.ClusterSpec object at 0x0000016990595F60>, '_task_type': 'worker', '_task_id': 0, '_global_id_in_cluster': 0, '_master': '', '_evaluation_master': '', '_is_chief': True, '_num_ps_replicas': 0, '_num_worker_replicas': 1}
+Not using Distribute Coordinator.
+Running training and evaluation locally (non-distributed).
+Start train and evaluate loop. The evaluate will happen after every checkpoint. Checkpoint frequency is determined based on RunConfig arguments: save_checkpoints_steps None or save_checkpoints_secs 10.
+Calling model_fn.
+From D:/Course2021Autumn/MachineLearningFintech/project/chinese_sentiment-master/model/cnn/main.py:80: dropout (from tensorflow.python.layers.core) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use keras.layers.dropout instead.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\keras\layers\core.py:143: calling dropout (from tensorflow.python.ops.nn_ops) with keep_prob is deprecated and will be removed in a future version.
+Instructions for updating:
+Please use `rate` instead of `keep_prob`. Rate should be set to `rate = 1 - keep_prob`.
+From D:/Course2021Autumn/MachineLearningFintech/project/chinese_sentiment-master/model/cnn/main.py:87: conv2d (from tensorflow.python.layers.convolutional) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use keras.layers.conv2d instead.
+From D:/Course2021Autumn/MachineLearningFintech/project/chinese_sentiment-master/model/cnn/main.py:89: max_pooling2d (from tensorflow.python.layers.pooling) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use keras.layers.max_pooling2d instead.
+From D:/Course2021Autumn/MachineLearningFintech/project/chinese_sentiment-master/model/cnn/main.py:97: dense (from tensorflow.python.layers.core) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use keras.layers.dense instead.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\ops\losses\losses_impl.py:209: to_float (from tensorflow.python.ops.math_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use tf.cast instead.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\ops\metrics_impl.py:2002: div (from tensorflow.python.ops.math_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Deprecated in favor of operator or tf.math.divide.
+Done calling model_fn.
+Create CheckpointSaverHook.
+Graph was finalized.
+Running local_init_op.
+Done running local_init_op.
+Saving checkpoints for 0 into results/model\model.ckpt.

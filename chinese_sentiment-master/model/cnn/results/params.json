@@ -1,0 +1,18 @@
+{
+    "batch_size": 20,
+    "buffer": 3500,
+    "dim": 300,
+    "dropout": 0.6,
+    "epochs": 50,
+    "filter_sizes": [
+        2,
+        3,
+        4
+    ],
+    "num_filters": 64,
+    "num_oov_buckets": 1,
+    "nwords": 300,
+    "tags": "..\\..\\data\\stock_comment\\vocab.labels.txt",
+    "w2v": "..\\..\\data\\stock_comment\\w2v.npz",
+    "words": "..\\..\\data\\stock_comment\\vocab.words.txt"
+}

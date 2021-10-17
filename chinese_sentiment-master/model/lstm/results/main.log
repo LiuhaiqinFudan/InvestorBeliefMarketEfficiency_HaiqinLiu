@@ -1,0 +1,121 @@
+Using config: {'_model_dir': 'results/model', '_tf_random_seed': None, '_save_summary_steps': 100, '_save_checkpoints_steps': None, '_save_checkpoints_secs': 60, '_session_config': allow_soft_placement: true
+graph_options {
+  rewrite_options {
+    meta_optimizer_iterations: ONE
+  }
+}
+, '_keep_checkpoint_max': 5, '_keep_checkpoint_every_n_hours': 10000, '_log_step_count_steps': 100, '_train_distribute': None, '_device_fn': None, '_protocol': None, '_eval_distribute': None, '_experimental_distribute': None, '_service': None, '_cluster_spec': <tensorflow.python.training.server_lib.ClusterSpec object at 0x00000265D9B615F8>, '_task_type': 'worker', '_task_id': 0, '_global_id_in_cluster': 0, '_master': '', '_evaluation_master': '', '_is_chief': True, '_num_ps_replicas': 0, '_num_worker_replicas': 1}
+Not using Distribute Coordinator.
+Running training and evaluation locally (non-distributed).
+Start train and evaluate loop. The evaluate will happen after every checkpoint. Checkpoint frequency is determined based on RunConfig arguments: save_checkpoints_steps None or save_checkpoints_secs 60.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\framework\op_def_library.py:263: colocate_with (from tensorflow.python.framework.ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Colocations handled automatically by placer.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\data\ops\dataset_ops.py:429: py_func (from tensorflow.python.ops.script_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+tf.py_func is deprecated in TF V2. Instead, use
+    tf.py_function, which takes a python function which manipulates tf eager
+    tensors instead of numpy arrays. It's easy to convert a tf eager tensor to
+    an ndarray (just call tensor.numpy()) but having access to eager tensors
+    means `tf.py_function`s can use accelerators such as GPUs as well as
+    being differentiable using a gradient tape.
+    
+Calling model_fn.
+Using config: {'_model_dir': 'results/model', '_tf_random_seed': None, '_save_summary_steps': 100, '_save_checkpoints_steps': None, '_save_checkpoints_secs': 60, '_session_config': allow_soft_placement: true
+graph_options {
+  rewrite_options {
+    meta_optimizer_iterations: ONE
+  }
+}
+, '_keep_checkpoint_max': 5, '_keep_checkpoint_every_n_hours': 10000, '_log_step_count_steps': 100, '_train_distribute': None, '_device_fn': None, '_protocol': None, '_eval_distribute': None, '_experimental_distribute': None, '_service': None, '_cluster_spec': <tensorflow.python.training.server_lib.ClusterSpec object at 0x000001EDCFE5F710>, '_task_type': 'worker', '_task_id': 0, '_global_id_in_cluster': 0, '_master': '', '_evaluation_master': '', '_is_chief': True, '_num_ps_replicas': 0, '_num_worker_replicas': 1}
+Not using Distribute Coordinator.
+Running training and evaluation locally (non-distributed).
+Start train and evaluate loop. The evaluate will happen after every checkpoint. Checkpoint frequency is determined based on RunConfig arguments: save_checkpoints_steps None or save_checkpoints_secs 60.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\framework\op_def_library.py:263: colocate_with (from tensorflow.python.framework.ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Colocations handled automatically by placer.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\data\ops\dataset_ops.py:429: py_func (from tensorflow.python.ops.script_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+tf.py_func is deprecated in TF V2. Instead, use
+    tf.py_function, which takes a python function which manipulates tf eager
+    tensors instead of numpy arrays. It's easy to convert a tf eager tensor to
+    an ndarray (just call tensor.numpy()) but having access to eager tensors
+    means `tf.py_function`s can use accelerators such as GPUs as well as
+    being differentiable using a gradient tape.
+    
+Calling model_fn.
+From main.py:74: dropout (from tensorflow.python.layers.core) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use keras.layers.dropout instead.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\keras\layers\core.py:143: calling dropout (from tensorflow.python.ops.nn_ops) with keep_prob is deprecated and will be removed in a future version.
+Instructions for updating:
+Please use `rate` instead of `keep_prob`. Rate should be set to `rate = 1 - keep_prob`.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\contrib\rnn\python\ops\lstm_ops.py:696: to_int64 (from tensorflow.python.ops.math_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use tf.cast instead.
+From main.py:87: dense (from tensorflow.python.layers.core) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use keras.layers.dense instead.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\ops\losses\losses_impl.py:209: to_float (from tensorflow.python.ops.math_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use tf.cast instead.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\ops\metrics_impl.py:2002: div (from tensorflow.python.ops.math_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Deprecated in favor of operator or tf.math.divide.
+Done calling model_fn.
+Create CheckpointSaverHook.
+Graph was finalized.
+Running local_init_op.
+Done running local_init_op.
+Saving checkpoints for 0 into results/model\model.ckpt.
+An error was raised. This may be due to a preemption in a connected worker or parameter server. The current session will be closed and a new session will be created. This error may also occur due to a gRPC failure caused by high memory or network bandwidth usage in the parameter servers. If this error occurs repeatedly, try increasing the number of parameter servers assigned to the job. Error: CuBlasGemm failed!
+	 [[node lstm_fused_cell/BlockLSTM (defined at main.py:81) ]]
+	 [[node precision/update_op (defined at main.py:108) ]]
+
+Caused by op 'lstm_fused_cell/BlockLSTM', defined at:
+  File "main.py", line 158, in <module>
+    tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow_estimator\python\estimator\training.py", line 471, in train_and_evaluate
+    return executor.run()
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow_estimator\python\estimator\training.py", line 611, in run
+    return self.run_local()
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow_estimator\python\estimator\training.py", line 712, in run_local
+    saving_listeners=saving_listeners)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow_estimator\python\estimator\estimator.py", line 358, in train
+    loss = self._train_model(input_fn, hooks, saving_listeners)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow_estimator\python\estimator\estimator.py", line 1124, in _train_model
+    return self._train_model_default(input_fn, hooks, saving_listeners)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow_estimator\python\estimator\estimator.py", line 1154, in _train_model_default
+    features, labels, model_fn_lib.ModeKeys.TRAIN, self.config)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow_estimator\python\estimator\estimator.py", line 1112, in _call_model_fn
+    model_fn_results = self._model_fn(features=features, **kwargs)
+  File "main.py", line 81, in model_fn
+    _, (cf, hf) = lstm_cell_fw(t, dtype=tf.float32, sequence_length=nwords)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\layers\base.py", line 530, in __call__
+    outputs = super(Layer, self).__call__(inputs, *args, **kwargs)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\keras\engine\base_layer.py", line 554, in __call__
+    outputs = self.call(inputs, *args, **kwargs)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\contrib\rnn\python\ops\lstm_ops.py", line 545, in call
+    inputs, initial_cell_state, initial_output, dtype, sequence_length)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\contrib\rnn\python\ops\lstm_ops.py", line 710, in _call_cell
+    use_peephole=self._use_peephole)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\contrib\rnn\ops\gen_lstm_ops.py", line 141, in block_lstm
+    use_peephole=use_peephole, name=name)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\framework\op_def_library.py", line 788, in _apply_op_helper
+    op_def=op_def)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\util\deprecation.py", line 507, in new_func
+    return func(*args, **kwargs)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\framework\ops.py", line 3300, in create_op
+    op_def=op_def)
+  File "C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\framework\ops.py", line 1801, in __init__
+    self._traceback = tf_stack.extract_stack()
+
+AbortedError (see above for traceback): CuBlasGemm failed!
+	 [[node lstm_fused_cell/BlockLSTM (defined at main.py:81) ]]
+	 [[node precision/update_op (defined at main.py:108) ]]
+
+Graph was finalized.
+From C:\Users\Haiqin\anaconda3\envs\python36\lib\site-packages\tensorflow\python\training\saver.py:1266: checkpoint_exists (from tensorflow.python.training.checkpoint_management) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use standard file APIs to check for files with this prefix.
+Restoring parameters from results/model\model.ckpt-0
