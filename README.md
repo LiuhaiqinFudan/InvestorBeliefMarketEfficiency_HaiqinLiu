@@ -35,7 +35,7 @@ I then use jieba cut, which is a Github project focusing on lemmatizing Chinese 
 3. Max-over-time pooling, generates the maximum one for each filter
 4. Fully connected layer with dropout and softmax output
 
-```
+
 
 ## Model 2： BI-LSTM
 
