@@ -1,0 +1,179 @@
+****************************************************************
+**** Tsinghua project: already got labels, no need to train ****
+****************************************************************
+clear all 
+*** merge the raw remarks with jieba cuts (already remove stopwords),
+*** the latter is input of the CNN model 
+global root = "D:\Course2021Autumn\MachineLearningFintech\project"
+cd "$root"
+
+*** 其实应该先Word2Vec, 然后再算jieba里每个词和整个清华labels的欧式距离
+*** 但这里就简单用pos, neg labels各自中了多少给每个remark评分
+infile str3 tag str3 predicts str200 remark using "$root\chinese_sentiment-master\model\cnn\results\score\eval.preds.txt", clear
+compress 
+gen ID = _n 
+save OutPuts\evalset, replace
+infile str3 tag str3 predicts str200 remark using "$root\chinese_sentiment-master\model\cnn\results\score\train.preds.txt", clear
+compress 
+gen ID = _n 
+save OutPuts\trainset, replace
+
+/* Then open the cmd line:
+
+python 9.GetTsinghuaScore-simplified.py 
+
+Then open and save in excel ***/
+
+
+import excel using "$root\chinese_sentiment-master\data\stock_comment\evalsetcut.xlsx", clear 
+gen stutter = ""
+findname, local(vars)
+foreach v in `vars'{
+replace stutter = stutter + `v'
+}
+keep stutter 
+gen ID = _n 
+save OutPuts\evalsetcut, replace 
+
+import excel using "$root\chinese_sentiment-master\data\stock_comment\trainsetcut.xlsx", clear 
+gen stutter = ""
+findname, local(vars)
+foreach v in `vars'{
+replace stutter = stutter + `v'
+}
+keep stutter 
+gen ID = _n 
+save OutPuts\trainsetcut, replace 
+
+merge 1:1 ID using OutPuts\trainset
+drop _merge 
+
+save OutPuts\remark_stutter, replace 
+
+cd "D:\Course2021Autumn\MachineLearningFintech\project\chinese_sentiment-master\data\stock_comment"
+import excel using TsinghuaScoreEval.xlsx, clear
+rename var1 remark 
+rename var2 scoreTsinghua  
+duplicates drop remark, force
+save "$root\CleanData\TsinghuaScoreEval", replace 
+
+import excel using TsinghuaScoreTrain.xlsx, clear 
+rename var1 remark 
+rename var2 scoreTsinghua  
+duplicates drop remark, force
+save "$root\CleanData\TsinghuaScoreTrain", replace 
+
+import excel using TsinghuaScoreUnlabel.xlsx, clear 
+rename var1 remark 
+rename var2 scoreTsinghua  
+duplicates drop remark, force
+save "$root\CleanData\TsinghuaScoreUnlabel", replace 
+
+import excel using "$root\CleanData\allComments-wind.xlsx", firstrow clear  // contain price, volume, turnover and dispersion
+merge m:1 remark using "$root\CleanData\TsinghuaScoreEval"
+drop _merge 
+merge m:1 remark using "$root\CleanData\TsinghuaScoreTrain"
+drop _merge 
+merge m:1 remark using "$root\CleanData\TsinghuaScoreUnlabel"
+drop _merge 
+
+merge m:1 remark OutPuts\evalset
+drop _merge 
+merge m:1 remark OutPuts\trainset
+drop _merge 
+
+** Aggregate to daily data (raw: minutescule)
+gen riskEvent = (tags == "POS")   // endogenous, and already daily 
+
+gen scoreEvent = (predicts == "POS")
+su reading 
+replace reading = r(mean) if reading == . 
+gen readingstd = (reading - r(mean))/r(sd)
+su comment 
+replace comment = r(mean) if comment == . 
+gen commentstd = (comment - r(mean))/r(sd)
+gen scoreEvent_readingweighted = scoreEvent * readingstd 
+gen scoreEvent_commentweighted = scoreEvent * commentstd 
+bys date stkid: egen scoreEventreading = mean(scoreEvent_readingweighted)
+bys date stkid: egen scoreEventcomment = mean(scoreEvent_commentweighted)
+
+gen scoreUniversal_readingweighted = scoreUniversal * readingstd 
+gen scoreUniversal_commentweighted = scoreUniversal * commentstd 
+bys date stkid: egen scoreUniversalreading = mean(scoreUniversal_readingweighted)
+bys date stkid: egen scoreUniversalcomment = mean(scoreUniversal_commentweighted)
+keep stkid date riskEvent scoreEvent_* scoreUniversal_* price volume turnover dispersion
+duplicates drop 
+findname, local(vars) not(stkid date)
+foreach v in `vars'{
+winsor `v', gen(`v'_ws) p(0.01) 
+drop `v'
+rename `v'_ws `v'
+}
+
+** Baseline 
+est clear 
+eststo: reghdfe price riskEvent, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe volume riskEvent, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe turnover riskEvent, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe dispersion riskEvent, a(stkid date) vce(cluster stkid date)
+estfe *, labels(stkid "Firm FE" date "Date FE")
+esttab * using OutPuts\BaselineRegression.csv, replace indicate(`r(indicate_fe)') star(* 0.1 ** 0.05 *** 0.01) ar2  
+
+** Reduced form 
+est clear 
+eststo: reghdfe price scoreEvent_readingweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe price scoreEvent_commentweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe volume scoreEvent_readingweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe volume scoreEvent_commentweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe turnover scoreEvent_readingweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe turnover scoreEvent_commentweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe dispersion scoreEvent_readingweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe dispersion scoreEvent_commentweighted, a(stkid date) vce(cluster stkid date)
+estfe *, labels(stkid "Firm FE" date "Date FE")
+esttab * using OutPuts\ReducedFromRegression_Event.csv, replace indicate(`r(indicate_fe)') star(* 0.1 ** 0.05 *** 0.01) ar2  
+
+est clear 	
+eststo: reghdfe price scoreUniversal_readingweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe price scoreUniversal_commentweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe volume scoreUniversal_readingweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe volume scoreUniversal_commentweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe turnover scoreUniversal_readingweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe turnover scoreUniversal_commentweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe dispersion scoreUniversal_readingweighted, a(stkid date) vce(cluster stkid date)
+eststo: reghdfe dispersion scoreUniversal_commentweighted, a(stkid date) vce(cluster stkid date)		
+estfe *, labels(stkid "Firm FE" date "Date FE")
+esttab * using OutPuts\ReducedFromRegression_Universal.csv,  replace indicate(`r(indicate_fe)') star(* 0.1 ** 0.05 *** 0.01) ar2  
+
+
+** IV estimation
+est clear 	
+eststo: ivreghdfe price (riskEvent = scoreEvent_readingweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe price (riskEvent = scoreEvent_commentweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe volume (riskEvent = scoreEvent_readingweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe volume (riskEvent = scoreEvent_commentweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe turnover (riskEvent = scoreEvent_readingweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe turnover (riskEvent = scoreEvent_commentweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe dispersion (riskEvent = scoreEvent_readingweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe dispersion (riskEvent = scoreEvent_commentweighted), a(stkid date) vce(cluster stkid date)		
+estfe *, labels(stkid "Firm FE" date "Date FE")
+esttab * using OutPuts\IVRegression_Event.csv,  replace indicate(`r(indicate_fe)') star(* 0.1 ** 0.05 *** 0.01) ar2  
+
+est clear 	
+eststo: ivreghdfe price (riskUniversal = scoreUniversal_readingweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe price (riskUniversal = scoreUniversal_commentweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe volume (riskUniversal = scoreUniversal_readingweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe volume (riskUniversal = scoreUniversal_commentweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe turnover (riskUniversal = scoreUniversal_readingweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe turnover (riskUniversal = scoreUniversal_commentweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe dispersion (riskUniversal = scoreUniversal_readingweighted), a(stkid date) vce(cluster stkid date)
+eststo: ivreghdfe dispersion (riskUniversal = scoreUniversal_commentweighted), a(stkid date) vce(cluster stkid date)		
+estfe *, labels(stkid "Firm FE" date "Date FE")
+esttab * using OutPuts\IVRegression_Universal.csv,  replace indicate(`r(indicate_fe)') star(* 0.1 ** 0.05 *** 0.01) ar2  
+
+
+
+
+
+
+
+

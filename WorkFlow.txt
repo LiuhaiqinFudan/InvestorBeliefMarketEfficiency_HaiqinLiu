@@ -1,0 +1,57 @@
+0.首先，wind调取个股代码,发债信息,评级变动情况, 导出至RawData\Selectedsample_xxx.xlsx
+
+因为时间限制，不可能爬取（高频，个股的样本量已经很大）所有公司的数据，因此需要事前有一定的筛选，尽量包含多的variation
+（如主体评级有变动，有显著的政策冲击的行业，境外发行主体等）
+
+1.运行WebScrape_guba.py: 
+
+从股吧网站爬取评论
+长期任务,目前港股+中概股+A股样本均有包含。对于A股企业，包含历史评论的时间跨度更长（页数达4000+的很多）。
+在代码运行的同时可以挑选几个到网页上看，大致页数多少，避免爬虫代码重复翻页，提高运行效率
+需要注意的是当网络状况不稳定时会重复爬取股吧首页新闻，对个股情感分析没有用，这些样本和爬取质量不佳的样本后续需要进行一定的补充排查；此外，正常情况下一页的评论量就已相当大，（评论是分钟级高频数据），因此翻页不会那么快，从而从command返回的verbose也可大致判断当前爬虫运行情况；正常爬取输出的file大小1000-3000KB比较正常（境外上市股票，散户只有通过沪港通投资，评论相对较少，100-200KB不等）
+
+2.MergeRemarks.py: 
+
+将个股数据合并,剔除漏爬评论(remark为空)并补充股票代码（文件名）
+输出CleanData\allComments.csv, 打开看一眼是否存在异常，另存为CleanData\allComments.xlsx
+
+3.CleanRemarks.do:
+
+在Train CNN/LSTM classifier之前先对remarks进行筛选与清洗，preprocess尽量提高training的performance
+输出CleanData\allComments-cleaned.xlsx，在excel中使用wind插件调取对应时间主体信用评级数据
+
+4.IdentifyEvents.do
+
+识别评级下调和展望调负面事件为风险事件，并将其后三天（包括当天）的所有评论作为负面评论样本
+【后续可考虑的补充检验：（1）使用Bryan Kelly的WSJ topic与样本企业行业相对应，识别舆情类风险事件
+（2）考察国家相关政策冲击（可能具有一定的主观性），作为政策类风险事件；
+以本样本为例，评级保持稳定视为正面，下调视为负面，则仅有恒大集团存在评级下调事件，variation太小；为此，将2020年9月1日之后的房企均视为负面
+（3）获取企业财报披露时间，净利润亏损视为经营类风险事件】
+对应识别评级上调事件前后三天的评论为正面
+-- 对于labeled data, negative sample和positive sample分别逐条输出保存为txt文件至
+chinese_sentiment-master\data\stock_comment\raw_data\neg和pos文件夹，成为后续NLP训练的原始样本数据
+此处直接使用https://github.com/linguishi/chinese_sentiment开发的中文情感分析项目，结果评估和输出形式上存在一定局限性。
+-- 对于unlabeled data, 另存为 CleanData/unlabeled
+
+5.根据https://github.com/linguishi/chinese_sentiment的说明进行切词-->向量化-->生成corpus-->训练CNN/LSTM模型-->评估模型训练效果
+PS：该项目在tensorflow 2.x 版本下不能运行；文件编码格式需要handle (默认gbk打不开换为utf8)；在运行各python程序之前删除目录下原始生成的文件，否则以append格式打开会加入非本项目的样本；tensorflow运行时只能开一个console，否则crash down
+
+模型预测准确性、模型测试演示见OutPuts；这部分演示均为in-sample perfomance 
+
+6.调用保存的模型，对unlabel data进行预测，并展示前5 positive/negative的样本，和使用清华label训练预测的结果进行对比
+其中，基于清华label的模型训练在sentiment_score-qinghualabel中进行，直接将tsinghua-negative和tsinghua-positive逐条输出作为袁术数据集
+
+7.GetSentimentScore.do 
+取回带有预测情感标签的数据，和股价/交易/日行情数据merge 
+目前仅实现情感标记为0/1 dummy（后面回归分析分别使用了linear, probit和logit三种）；后续需对Github代码进行改进，使其输出连续的情感打分数值（代表情感为正面的概率，应该直接去掉softmax函数就可以，具体如何实现还没做好
+
+8.RegressionAnalysis.do 
+回归分析：由于解释变量为高频日间数据，分别采用评论量加权和阅读量加权，将股吧情感倾向aggregate到日度。
+目前只爬取了股吧数据，使用中文文本分析，endogenous equation是使用风险事件定义的NEGATIVE remark为解释变量，reduced form为使用CNN/LSTM classifier预测的情感标签。
+后续考虑（1）爬取WSJ chinese上对应本文所包含的样本主体的新闻评论。这类评论相对股吧更为客观严肃，外生性更强但情感倾向可能不明显。但考虑到WSJ数据获取相对容易（八爪鱼可以识别网页结构）+至少和金融类比较相关，这是本项目最需要实现的贡献，specific for financial market。（2）使用Bryan Kelly, Structure of economic news，利用WSJ估计的topic model，将他所定义的topic和样本企业对应起来（具体有无明显的pattern还得看，否则自行尝试实现topic model改进目前的结果），构建exposure指标作为工具变量，做IV estimation
+PS：其余公司层面公司变量使用AshareAll年度的panel进行merge
+
+9.ImpulseResponse
+这部分使用R软件实现，使用Brunnermier et al. 2021 (AER) identification by heteroskedascity的方法评估investor sentiment对price/volume/liquidity的impact
+
+
